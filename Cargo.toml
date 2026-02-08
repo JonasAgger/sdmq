@@ -1,0 +1,30 @@
+[package]
+name = "sdmq"
+version = "0.1.0"
+edition = "2024"
+rust-version = "1.85"
+authors = ["Jonas Agger mail@jonasagger.com"]
+license = "Apache-2.0"
+description = "Small Dumb Message Queue for home use"
+repository = "https://github.com/JonasAgger/sdmq"
+homepage = "https://github.com/JonasAgger/sdmq"
+readme = "README.md"
+keywords = ["queue", "embedded"]
+categories = ["no-std"]
+exclude = [".github"]
+
+[dependencies]
+serde = { version = "1", optional = true, default-features = false }
+serde_json = { version = "1", optional = true }
+serde-json-core = { version = "0.6", optional = true, default-features = false }
+
+
+[features]
+default = []
+std = []
+serde_json = ["std", "dep:serde", "dep:serde_json"]
+serde_json_core = ["dep:serde", "dep:serde-json-core"]
+
+[package.metadata.docs.rs]
+all-features = true
+rustdoc-args = ["--cfg", "docsrs"]
