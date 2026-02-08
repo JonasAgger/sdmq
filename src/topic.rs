@@ -1,4 +1,4 @@
-use core::fmt::Debug;
+use core::fmt::{Debug, Display};
 
 #[derive(Clone, Copy)]
 pub struct Topic<'a> {
@@ -23,16 +23,17 @@ impl<'a> Topic<'a> {
     }
 
     pub fn get(&self, idx: usize) -> &'a str {
-        self.inner.split('.').skip(idx).next().unwrap_or("")
-    }
-
-    #[cfg(feature = "std")]
-    pub fn to_string(&self) -> String {
-        self.inner.to_owned()
+        self.inner.split('.').nth(idx).unwrap_or("")
     }
 }
 
 impl<'a> Debug for Topic<'a> {
+    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
+        write!(f, "{}", self.inner)
+    }
+}
+
+impl<'a> Display for Topic<'a> {
     fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
         write!(f, "{}", self.inner)
     }

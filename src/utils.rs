@@ -39,6 +39,6 @@ impl<T: AsMut<[u8]>> Cursor<T> {
 
         buf[..N].copy_from_slice(&data);
 
-        self.pos = self.pos + N;
+        self.pos += N;
     }
 }

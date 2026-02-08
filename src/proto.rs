@@ -15,15 +15,13 @@ pub struct SdmqHeader {
 impl SdmqHeader {
     pub fn parse(buf: &[u8]) -> Self {
         let mut cursor = Cursor::new(buf);
-        let header = SdmqHeader {
+        SdmqHeader {
             magic: cursor.read_u32(),
             hash: cursor.read_u32(),
             options: cursor.read_u16(),
             topic_len: cursor.read_u16(),
             data_len: cursor.read_u32(),
-        };
-
-        header
+        }
     }
 
     pub fn write_to(self, buf: &mut [u8]) {
@@ -111,9 +109,15 @@ pub mod write {
 
     pub type SdmqPacket = SdmqPacketBuf<1024>;
 
-    pub struct SdmqPacketBuf<const MAX_SIZE: usize> {
-        buffer: [u8; MAX_SIZE],
+    pub struct SdmqPacketBuf<const SIZE: usize> {
+        buffer: [u8; SIZE],
         pos: usize,
+    }
+
+    impl<const SIZE: usize> Default for SdmqPacketBuf<SIZE> {
+        fn default() -> Self {
+            Self::new()
+        }
     }
 
     impl<const MAX_SIZE: usize> SdmqPacketBuf<MAX_SIZE> {
@@ -167,6 +171,7 @@ pub mod write {
     pub struct Empty;
     pub struct Topic(usize);
     pub struct Data(usize);
+    #[cfg(feature = "std")]
     struct Intermediate(usize);
 
     pub struct SdMessageBuilder<'a, T, D> {
@@ -246,7 +251,7 @@ pub mod write {
     }
 
     impl<'a> SdMessageBuilder<'a, Topic, Data> {
-        pub fn done(mut self, msg_type: SdmqMsgType) -> usize {
+        pub fn done(self, msg_type: SdmqMsgType) -> usize {
             let pos = self.data.0 + self.topic.0 + size_of::<SdmqHeader>();
 
             // CRC_hash topic + payload
@@ -260,7 +265,7 @@ pub mod write {
                 data_len: self.data.0 as u32,
             };
 
-            header.write_to(&mut self.inner);
+            header.write_to(self.inner);
 
             pos
         }
@@ -307,7 +312,6 @@ pub mod write {
 #[cfg(all(test, feature = "std"))]
 mod tests {
     use super::read::*;
-    use super::*;
 
     #[test]
     fn test() {
