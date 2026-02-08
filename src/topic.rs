@@ -25,6 +25,11 @@ impl<'a> Topic<'a> {
     pub fn get(&self, idx: usize) -> &'a str {
         self.inner.split('.').skip(idx).next().unwrap_or("")
     }
+
+    #[cfg(feature = "std")]
+    pub fn to_string(&self) -> String {
+        self.inner.to_owned()
+    }
 }
 
 impl<'a> Debug for Topic<'a> {

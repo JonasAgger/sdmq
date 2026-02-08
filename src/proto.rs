@@ -202,7 +202,7 @@ pub mod write {
     }
 
     impl<'a> SdMessageBuilder<'a, Topic, Empty> {
-        #[cfg(feature = "serde_json_core")]
+        #[cfg(all(feature = "serde_json_core", not(feature = "serde_json")))]
         pub fn write_json(self, data: impl serde::Serialize) -> SdMessageBuilder<'a, Topic, Data> {
             let offset = size_of::<SdmqHeader>() + self.topic.0;
             let written = serde_json_core::to_slice(&data, &mut self.inner[offset..]).unwrap();
@@ -215,16 +215,15 @@ pub mod write {
         }
 
         #[cfg(feature = "serde_json")]
-        pub fn write_json(self, data: impl serde::Serialize) -> Cursor<'a, Topic, Data> {
-            let offset = size_of::<SmtHeader>() + self.topic.0;
-            let mut s = Cursor {
+        pub fn write_json(self, data: impl serde::Serialize) -> SdMessageBuilder<'a, Topic, Data> {
+            let mut s = SdMessageBuilder {
                 inner: self.inner,
                 topic: self.topic,
                 data: Intermediate(0),
             };
             serde_json::to_writer(&mut s, &data).unwrap();
 
-            Cursor {
+            SdMessageBuilder {
                 inner: s.inner,
                 topic: s.topic,
                 data: Data(s.data.0),
