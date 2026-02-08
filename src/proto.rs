@@ -286,7 +286,7 @@ pub mod write {
     }
 
     #[cfg(feature = "std")]
-    impl<'a> Write for SdMessageBuilder<'a, Topic, Intermediate> {
+    impl<'a> std::io::Write for SdMessageBuilder<'a, Topic, Intermediate> {
         fn write(&mut self, buf: &[u8]) -> std::io::Result<usize> {
             let data_start = self.topic.0 + size_of::<SdmqHeader>();
             let pos = data_start + self.data.0;

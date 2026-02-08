@@ -3,3 +3,8 @@
 mod proto;
 mod topic;
 mod utils;
+
+pub use proto::read::SdmqProto;
+pub use proto::write::*;
+pub use proto::*;
+pub use topic::Topic;
